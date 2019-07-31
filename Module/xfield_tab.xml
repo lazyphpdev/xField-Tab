@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dleplugin>
+	<name>Дополнительные поля по вкладкам</name>
+	<description>Модуль позволит группировать дополнительные поля, при добавлении / редактировании новости в админ панели, по вкладкам. [ by https://lazydev.pro ]</description>
+	<icon></icon>
+	<version>1.0.0</version>
+	<dleversion>13</dleversion>
+	<versioncompare>greater</versioncompare>
+	<upgradeurl></upgradeurl>
+	<filedelete>0</filedelete>
+	<needplugin></needplugin>
+	<mysqlinstall><![CDATA[INSERT INTO `{prefix}_admin_sections` (`name`, `title`, `descr`, `icon`, `allow_groups`) VALUES ('xfield_tab', 'xField Tab', 'Группирование дополнительных полей по вкладкам', '', '1');]]></mysqlinstall>
+	<mysqlupgrade><![CDATA[]]></mysqlupgrade>
+	<mysqlenable><![CDATA[]]></mysqlenable>
+	<mysqldisable><![CDATA[]]></mysqldisable>
+	<mysqldelete><![CDATA[DELETE FROM `{prefix}_admin_sections` WHERE name='xfield_tab';]]></mysqldelete>
+	<phpinstall><![CDATA[]]></phpinstall>
+	<phpupgrade><![CDATA[]]></phpupgrade>
+	<phpenable><![CDATA[]]></phpenable>
+	<phpdisable><![CDATA[]]></phpdisable>
+	<phpdelete><![CDATA[]]></phpdelete>
+	<file name="engine/inc/xfields.php">
+		<operation action="after">
+			<searchcode><![CDATA[$xfieldsdata = xfieldsdataload ($xfieldsid);]]></searchcode>
+			<replacecode><![CDATA[$xFieldTabs = [];]]></replacecode>
+		</operation>
+		<operation action="replace">
+			<searchcode><![CDATA[$output .= <<<HTML
+<div id="$holderid"]]></searchcode>
+			<replacecode><![CDATA[$xFieldTabs[$fieldname] = <<<HTML
+<div id="$holderid"]]></replacecode>
+		</operation>
+		<operation action="before">
+			<searchcode><![CDATA[$output = preg_replace("'\\[not-optional\\](.*?)\\[/not-optional\\]'s", $value[5] ? "" : "\\1", $output);]]></searchcode>
+			<replacecode><![CDATA[if ($xfieldmode != "site") {
+	$xFieldTabs[$fieldname] = preg_replace("'\\[not-optional\\](.*?)\\[/not-optional\\]'s", $value[5] ? '' : "\\1", $xFieldTabs[$fieldname]);
+}]]></replacecode>
+		</operation>
+	</file>
+	<file name="engine/inc/addnews.php">
+		<operation action="after">
+			<searchcode><![CDATA[{$output}]]></searchcode>
+			<replacecode><![CDATA[HTML;
+include ENGINE_DIR . '/lazydev/xfield_tab/index.php';
+echo <<<HTML]]></replacecode>
+		</operation>
+	</file>
+	<file name="engine/inc/editnews.php">
+		<operation action="after">
+			<searchcode><![CDATA[{$output}]]></searchcode>
+			<replacecode><![CDATA[HTML;
+include ENGINE_DIR . '/lazydev/xfield_tab/index.php';
+echo <<<HTML]]></replacecode>
+		</operation>
+	</file>
+</dleplugin>
